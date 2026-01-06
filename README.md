@@ -66,7 +66,7 @@ The following outputs are included in this project:
 1. **Mean Yield Summary Table**  
    - Displays average Yield for each Temperature–Pressure combination
   
-   ![Mean Yield Summary Table](figures/mean_yield_table.png)
+   ![Mean Yield Summary Table](figures/mean_yield_summary_table.png)
 
     ---
    
@@ -74,14 +74,14 @@ The following outputs are included in this project:
    - Visualizes trends across Pressure levels for each Temperature
    - Supports the conclusion of no strong interaction effect
 
-   ![Interaction Plot](figures/interaction_plot.png)
+   ![Interaction Plot](figures/interaction_plot_temperature_pressure.png)
 
     ---
    
 3. **Residual Diagnostic Plots**  
    - Used to assess normality, homoscedasticity, and model adequacy
 
-  ![Residual Diagnostic Plots](figures/residual_diagnostics.png)
+  ![Residual Diagnostic Plots](figures/residual_diagnostics_anova.png)
 
   ---
   
