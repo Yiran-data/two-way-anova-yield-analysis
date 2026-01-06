@@ -1,0 +1,121 @@
+---
+title: "two_way_anova_yield_analysis"
+author: "Yiran Han"
+date: "2025-10-20"
+output: html_document
+---
+
+```{r}
+# ------------------------------------------------------------
+# Construct a two-factor factorial experiment with replication
+# Response variable: Yield
+# Factors:
+#   - Temperature: 150, 160, 170
+#   - Pressure: 200, 215, 230
+# Each combination has 2 replicates
+# ------------------------------------------------------------
+
+library(dplyr)
+data <- data.frame(
+  Temperature=rep(c(150, 160, 170), each =6), 
+  Pressure=rep(rep(c(200, 215,230),each=2),times=3), 
+  Replicate=rep(1:2,times=9), 
+  Yield =c(
+  # temperature = 150
+  90.4, 90.2, # pressure 200
+  90.7, 90.6, # pressure 215
+  90.2, 90.4, # pressure 230
+  
+  # temperature = 160
+  90.1, 90.3, # pressure 200
+  90.5, 90.6, # pressure 230
+  89.9, 90.1,
+  
+  # temperature = 170
+  90.5, 90.7,# pressure 200
+  90.8, 90.9,# pressure 215
+  90.4, 90.1# pressure 230
+  )
+)  
+
+# Convert predictors to categorical factors
+data$Temperature <- factor(data$Temperature, levels = c(150, 160, 170))
+data$Pressure <- factor(data$Pressure, levels = c(200, 215, 230))
+
+# ------------------------------------------------------------
+# Fit two-way ANOVA model with interaction
+# ------------------------------------------------------------
+mod <- aov(Yield~Temperature*Pressure, data =data)
+
+# ANOVA table to test:
+# - main effect of Temperature
+# - main effect of Pressure
+# - interaction between Temperature and Pressure
+anova(mod)
+```
+
+```{r}
+# ------------------------------------------------------------
+# Post-hoc analysis for significant main effects
+# Tukey HSD controls family-wise error rate
+# ------------------------------------------------------------
+
+TukeyHSD(mod, which = c("Temperature", "Pressure"))
+```
+
+```{r}
+# ------------------------------------------------------------
+# Diagnostic plots to assess model assumptions:
+# - Linearity
+# - Normality of residuals
+# - Homoscedasticity
+# ------------------------------------------------------------
+
+par(mfrow = c(2, 2))
+plot(mod)
+```
+
+```{r}
+# ------------------------------------------------------------
+# Compute mean yield for each Temperature–Pressure combination
+# Helps identify practically optimal settings
+# ------------------------------------------------------------
+
+data %>%
+  group_by(Temperature, Pressure) %>%
+  summarise(mean_yield = mean(Yield), .groups = "drop") %>%
+  arrange(desc(mean_yield))
+
+```
+
+```{r}
+# ------------------------------------------------------------
+# Interaction plot for visual assessment of interaction effects
+# ------------------------------------------------------------
+
+interaction.plot(
+  x.factor = data$Pressure,
+  trace.factor = data$Temperature,
+  response = data$Yield,
+  xlab = "Pressure",
+  ylab = "Mean Yield",
+  trace.label = "Temperature"
+)
+```
+
+```{r}
+# ------------------------------------------------------------
+# Estimated marginal means for main effects and interaction
+# ------------------------------------------------------------
+
+model.tables(mod, type = "means")
+```
+
+```{r}
+# ------------------------------------------------------------
+# Identify the experimental setting with maximum observed yield
+# ------------------------------------------------------------
+
+max_yield <- data[which.max(data$Yield), ]
+max_yield
+```
